@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CoWatch — The watch tracker for the two of you</title>
+<meta name="description" content="Track movies, TV & anime — together. Share a watchlist, swipe to match, see each other's progress spoiler-safely, and get your couple's yearly Wrapped." />
+<meta property="og:title" content="CoWatch — The watch tracker for the two of you" />
+<meta property="og:description" content="Track movies, TV & anime together. Swipe to match, never argue about what to watch again." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#0E0E14" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --primary: #7C5CFC;
+    --secondary: #FF5C8A;
+    --bg: #0E0E14;
+    --surface: #17171F;
+    --elevated: #20202B;
+    --text: #F4F4F7;
+    --text-2: #A6A6B5;
+    --text-3: #6C6C7C;
+    --separator: #2A2A36;
+    --radius: 20px;
+    --grad: linear-gradient(135deg, #7C5CFC 0%, #FF5C8A 100%);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .grad-text {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  /* Ambient gradient orbs */
+  .orb { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.32; z-index: 0; pointer-events: none; }
+  .orb-1 { width: 480px; height: 480px; background: #7C5CFC; top: -160px; left: -120px; }
+  .orb-2 { width: 420px; height: 420px; background: #FF5C8A; top: 240px; right: -140px; }
+
+  /* Nav */
+  nav { position: sticky; top: 0; z-index: 50; backdrop-filter: blur(14px); background: rgba(14,14,20,0.7); border-bottom: 1px solid var(--separator); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+  .logo-mark { width: 30px; height: 30px; border-radius: 9px; background: var(--grad); display: grid; place-items: center; font-size: 16px; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { color: var(--text-2); font-weight: 500; font-size: 15px; transition: color .2s; }
+  .nav-links a:hover { color: var(--text); }
+  .btn { display: inline-block; font-weight: 600; border-radius: 999px; padding: 11px 22px; transition: transform .15s, box-shadow .2s; cursor: pointer; border: none; font-size: 15px; font-family: inherit; }
+  .btn-primary { background: var(--grad); color: #fff; box-shadow: 0 8px 28px rgba(124,92,252,0.35); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 34px rgba(124,92,252,0.45); }
+  .btn-ghost { background: var(--surface); color: var(--text); border: 1px solid var(--separator); }
+  .btn-ghost:hover { background: var(--elevated); }
+  @media (max-width: 720px) { .nav-links a:not(.btn) { display: none; } }
+
+  /* Hero */
+  .hero { position: relative; z-index: 1; padding: 80px 0 60px; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--separator); color: var(--text-2); padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; margin-bottom: 22px; }
+  .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--secondary); }
+  h1 { font-size: clamp(40px, 6vw, 62px); line-height: 1.04; letter-spacing: -0.03em; font-weight: 800; }
+  .sub { color: var(--text-2); font-size: clamp(17px, 2.2vw, 20px); margin: 22px 0 32px; max-width: 520px; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  .cta-note { color: var(--text-3); font-size: 14px; margin-top: 16px; }
+  @media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 36px; } .sub { max-width: none; } }
+
+  /* Phone mockup */
+  .phone-wrap { display: flex; justify-content: center; }
+  .phone { width: 290px; height: 590px; background: #060609; border-radius: 42px; padding: 12px; box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06); position: relative; }
+  .phone-screen { width: 100%; height: 100%; background: var(--bg); border-radius: 32px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 96px; height: 26px; background: #060609; border-radius: 999px; z-index: 5; }
+  .screen-head { padding: 38px 20px 12px; }
+  .screen-title { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+  .match-banner { margin: 8px 20px 4px; background: var(--grad); border-radius: 16px; padding: 14px 16px; display: flex; align-items: center; gap: 10px; font-weight: 700; box-shadow: 0 8px 24px rgba(255,92,138,0.3); }
+  .match-banner .heart { font-size: 18px; }
+  .cards { display: flex; gap: 12px; padding: 14px 20px; }
+  .poster { flex: 1; aspect-ratio: 2/3; border-radius: 14px; display: flex; align-items: flex-end; padding: 10px; font-size: 12px; font-weight: 700; color: #fff; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+  .p1 { background: linear-gradient(160deg, #3A2E6E, #7C5CFC); }
+  .p2 { background: linear-gradient(160deg, #6E2E4E, #FF5C8A); }
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 10px 20px; }
+  .thumb { width: 38px; height: 56px; border-radius: 8px; flex-shrink: 0; }
+  .t1 { background: linear-gradient(160deg, #2A3A6E, #4E8CFF); }
+  .t2 { background: linear-gradient(160deg, #2E6E4E, #2FBF71); }
+  .t3 { background: linear-gradient(160deg, #6E5A2E, #F5A524); }
+  .list-meta { flex: 1; }
+  .list-meta .lt { font-size: 13px; font-weight: 700; }
+  .list-meta .ls { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .badge { font-size: 10px; font-weight: 700; color: #F5A524; }
+  .tabbar { margin-top: auto; display: flex; justify-content: space-around; padding: 12px 0 16px; border-top: 1px solid var(--separator); background: var(--surface); }
+  .tab { font-size: 18px; opacity: 0.4; }
+  .tab.active { opacity: 1; }
+
+  /* Sections */
+  section { position: relative; z-index: 1; }
+  .section-head { text-align: center; max-width: 640px; margin: 0 auto 48px; }
+  .section-head h2 { font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.02em; font-weight: 800; }
+  .section-head p { color: var(--text-2); font-size: 18px; margin-top: 14px; }
+  .features { padding: 80px 0; border-top: 1px solid var(--separator); }
+  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .feature-grid { grid-template-columns: 1fr; } }
+  .card { background: var(--surface); border: 1px solid var(--separator); border-radius: var(--radius); padding: 26px; transition: transform .2s, border-color .2s; }
+  .card:hover { transform: translateY(-4px); border-color: #3a3a4a; }
+  .card .ic { width: 46px; height: 46px; border-radius: 13px; background: var(--elevated); display: grid; place-items: center; font-size: 22px; margin-bottom: 16px; }
+  .card h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .card p { color: var(--text-2); font-size: 15px; }
+
+  /* Wedge band */
+  .wedge { padding: 80px 0; border-top: 1px solid var(--separator); }
+  .wedge-inner { background: var(--surface); border: 1px solid var(--separator); border-radius: 28px; padding: 56px 40px; text-align: center; position: relative; overflow: hidden; }
+  .wedge-inner::before { content: ""; position: absolute; inset: 0; background: var(--grad); opacity: 0.08; }
+  .wedge-inner > * { position: relative; }
+  .wedge h2 { font-size: clamp(26px, 3.5vw, 38px); letter-spacing: -0.02em; font-weight: 800; max-width: 720px; margin: 0 auto; }
+  .wedge p { color: var(--text-2); font-size: 18px; margin: 18px auto 0; max-width: 560px; }
+
+  /* Waitlist */
+  .waitlist { padding: 90px 0 80px; border-top: 1px solid var(--separator); text-align: center; }
+  .waitlist h2 { font-size: clamp(30px, 4vw, 44px); letter-spacing: -0.02em; font-weight: 800; }
+  .waitlist p { color: var(--text-2); font-size: 18px; margin: 14px auto 32px; max-width: 480px; }
+  .form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
+  .form input { flex: 1; background: var(--surface); border: 1px solid var(--separator); color: var(--text); padding: 14px 18px; border-radius: 999px; font-size: 15px; font-family: inherit; outline: none; transition: border-color .2s; }
+  .form input:focus { border-color: var(--primary); }
+  @media (max-width: 520px) { .form { flex-direction: column; } }
+  .form-note { color: var(--text-3); font-size: 13px; margin-top: 16px; }
+
+  /* Footer */
+  footer { border-top: 1px solid var(--separator); padding: 40px 0; }
+  .foot-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .foot-inner .logo { font-size: 18px; }
+  .attr { color: var(--text-3); font-size: 13px; max-width: 520px; }
+  .foot-links { display: flex; gap: 22px; color: var(--text-2); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<nav>
+  <div class="wrap nav-inner">
+    <div class="logo"><span class="logo-mark">▶</span> <span>Co<span class="grad-text">Watch</span></span></div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#why">Why CoWatch</a>
+      <a href="#waitlist" class="btn btn-primary">Get early access</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="pill"><span class="dot"></span> Coming soon to iOS</span>
+      <h1>The watch tracker for <span class="grad-text">the two of you</span>.</h1>
+      <p class="sub">Track movies, TV &amp; anime — together. Share a watchlist, swipe to match, and never argue about what to put on again.</p>
+      <div class="cta-row">
+        <a href="#waitlist" class="btn btn-primary">Get early access</a>
+        <a href="#features" class="btn btn-ghost">See how it works</a>
+      </div>
+      <p class="cta-note">Free to use. One shared space with your partner, on us.</p>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="phone-screen">
+          <div class="screen-head"><div class="screen-title">Together</div></div>
+          <div class="match-banner"><span class="heart">❤️</span> It's a match — watch tonight!</div>
+          <div class="cards">
+            <div class="poster p1">Dune: Part Two</div>
+            <div class="poster p2">Arcane</div>
+          </div>
+          <div class="list-row">
+            <div class="thumb t1"></div>
+            <div class="list-meta"><div class="lt">Breaking Bad</div><div class="ls">▶ Watching · TV</div></div>
+            <div class="badge">★ 9.3</div>
+          </div>
+          <div class="list-row">
+            <div class="thumb t2"></div>
+            <div class="list-meta"><div class="lt">Attack on Titan</div><div class="ls">▶ Watching · Anime</div></div>
+            <div class="badge">★ 9.0</div>
+          </div>
+          <div class="list-row">
+            <div class="thumb t3"></div>
+            <div class="list-meta"><div class="lt">Stranger Things</div><div class="ls">✓ Watched · TV</div></div>
+            <div class="badge">★ 8.6</div>
+          </div>
+          <div class="tabbar">
+            <span class="tab">🔍</span><span class="tab">▦</span><span class="tab active">❤️</span><span class="tab">📊</span><span class="tab">⚙️</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="features" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Everything you watch. <span class="grad-text">Both of you.</span></h2>
+      <p>A real tracker — built for a household, not a single viewer.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="card"><div class="ic">💞</div><h3>Built for two</h3><p>A shared space with your partner: one watchlist, two sets of progress, zero spreadsheets.</p></div>
+      <div class="card"><div class="ic">🔥</div><h3>Swipe to match</h3><p>Both swipe right on the same title and it lands in "Matched." Decide what to watch in seconds.</p></div>
+      <div class="card"><div class="ic">🎌</div><h3>Anime + TV + film, equals</h3><p>Anime is first-class here — tracked alongside live-action, not bolted on as an afterthought.</p></div>
+      <div class="card"><div class="ic">📺</div><h3>Episode progress &amp; alerts</h3><p>Track every episode, see what's next, and get a push when a show you follow airs something new.</p></div>
+      <div class="card"><div class="ic">🙈</div><h3>Spoiler-safe</h3><p>See where your partner is on a show — without the app spoiling what's past their point.</p></div>
+      <div class="card"><div class="ic">✨</div><h3>Your couple's Wrapped</h3><p>A beautiful, shareable year-in-review of everything you watched together.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wedge" id="why">
+  <div class="wrap">
+    <div class="wedge-inner">
+      <h2>Every other tracker is single-player. <span class="grad-text">Yours isn't.</span></h2>
+      <p>CoWatch is shared by design — so the two of you finally have one place for what you've seen, what you're watching, and what's next.</p>
+    </div>
+  </div>
+</section>
+
+<section class="waitlist" id="waitlist">
+  <div class="wrap">
+    <h2>Be first in line.</h2>
+    <p>Join the waitlist and get early access when CoWatch lands on the App Store.</p>
+    <!-- To collect emails for real: create a free form at https://formspree.io and put your form id below (replace REPLACE_ME). Until then this is a friendly placeholder. -->
+    <form class="form" action="https://formspree.io/f/REPLACE_ME" method="POST">
+      <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address" />
+      <button type="submit" class="btn btn-primary">Get early access</button>
+    </form>
+    <p class="form-note">No spam. Just a heads-up when it's ready.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-inner">
+    <div>
+      <div class="logo" style="margin-bottom:12px;"><span class="logo-mark">▶</span> <span>Co<span class="grad-text">Watch</span></span></div>
+      <p class="attr">This product uses the TMDB API but is not endorsed or certified by TMDB.</p>
+    </div>
+    <div class="foot-links">
+      <a href="#features">Features</a>
+      <a href="#waitlist">Early access</a>
+    </div>
+  </div>
+  <div class="wrap" style="margin-top:24px;color:var(--text-3);font-size:13px;">© 2026 CoWatch. Made for the two of you.</div>
+</footer>
+</body>
+</html>
